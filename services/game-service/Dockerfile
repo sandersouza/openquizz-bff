@@ -1,6 +1,6 @@
 FROM python:3.12-slim
 WORKDIR /app
-COPY ../../packages /packages
+COPY packages /packages
 COPY services/game-service/requirements.txt /app/requirements.txt
 RUN pip install --no-cache-dir -r requirements.txt && pip install --no-cache-dir -e /packages/common_schemas
 COPY services/game-service/app /app/app

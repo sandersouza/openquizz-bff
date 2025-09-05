@@ -35,7 +35,9 @@ services:
     ports: ["6379:6379"]
 
   quiz-service:
-    build: ./services/quiz-service
+    build:
+      context: .
+      dockerfile: services/quiz-service/Dockerfile
     environment:
       - MONGO_URI=${MONGO_URI:-mongodb://mongo:27017/openquiz}
     labels:
@@ -43,7 +45,9 @@ services:
     depends_on: [mongo]
 
   game-service:
-    build: ./services/game-service
+    build:
+      context: .
+      dockerfile: services/game-service/Dockerfile
     environment:
       - MONGO_URI=${MONGO_URI:-mongodb://mongo:27017/openquiz}
       - REDIS_URL=${REDIS_URL:-redis://redis:6379/0}
@@ -52,7 +56,9 @@ services:
     depends_on: [mongo, redis]
 
   bff-admin:
-    build: ./apps/bff-admin
+    build:
+      context: .
+      dockerfile: apps/bff-admin/Dockerfile
     environment:
       - UPSTREAM_QUIZ=http://quiz-service:8000
       - UPSTREAM_GAME=http://game-service:8000
@@ -64,7 +70,9 @@ services:
     depends_on: [quiz-service, game-service]
 
   bff-player:
-    build: ./apps/bff-player
+    build:
+      context: .
+      dockerfile: apps/bff-player/Dockerfile
     environment:
       - UPSTREAM_GAME=http://game-service:8000
     labels:
@@ -75,7 +83,9 @@ services:
     depends_on: [game-service]
 
   ws-gateway:
-    build: ./gateway/realtime
+    build:
+      context: .
+      dockerfile: gateway/realtime/Dockerfile
     environment:
       - REDIS_URL=${REDIS_URL:-redis://redis:6379/0}
     labels:
