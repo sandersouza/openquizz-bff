@@ -1,4 +1,33 @@
 http:
+  routers:
+    bff-admin:
+      rule: PathPrefix(`/admin`)
+      entryPoints: [web, websecure, h3]
+      service: bff-admin
+      middlewares: [gzip]
+    bff-player:
+      rule: PathPrefix(`/player`)
+      entryPoints: [web, websecure, h3]
+      service: bff-player
+      middlewares: [gzip]
+    ws-gateway:
+      rule: PathPrefix(`/ws`)
+      entryPoints: [web, websecure, h3]
+      service: ws-gateway
+      middlewares: [gzip]
+  services:
+    bff-admin:
+      loadBalancer:
+        servers:
+          - url: http://bff-admin:8000
+    bff-player:
+      loadBalancer:
+        servers:
+          - url: http://bff-player:8000
+    ws-gateway:
+      loadBalancer:
+        servers:
+          - url: http://ws-gateway:8000
   middlewares:
     gzip:
       compress: {}
