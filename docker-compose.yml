@@ -1,0 +1,89 @@
+version: "3.9"
+
+services:
+  traefik:
+    image: traefik:v3.1
+    command:
+      - --api.dashboard=true
+      - --entrypoints.web.address=:80
+      - --entrypoints.websecure.address=:443
+      - --entrypoints.h3.address=:443/udp
+      - --providers.file.directory=/etc/traefik/dynamic
+      - --providers.file.watch=true
+    ports:
+      - "80:80"
+      - "443:443"
+      - "443:443/udp"
+    volumes:
+      - ./infra/traefik/traefik.yml:/etc/traefik/traefik.yml:ro
+      - ./infra/traefik/dynamic:/etc/traefik/dynamic:ro
+    depends_on:
+      - bff-admin
+      - bff-player
+      - ws-gateway
+
+  mongo:
+    image: mongo:7
+    restart: unless-stopped
+    ports: ["27017:27017"]
+    volumes:
+      - mongo_data:/data/db
+
+  redis:
+    image: redis:7-alpine
+    command: ["redis-server", "--appendonly", "no"]
+    ports: ["6379:6379"]
+
+  quiz-service:
+    build: ./services/quiz-service
+    environment:
+      - MONGO_URI=${MONGO_URI:-mongodb://mongo:27017/openquiz}
+    labels:
+      - traefik.enable=false
+    depends_on: [mongo]
+
+  game-service:
+    build: ./services/game-service
+    environment:
+      - MONGO_URI=${MONGO_URI:-mongodb://mongo:27017/openquiz}
+      - REDIS_URL=${REDIS_URL:-redis://redis:6379/0}
+    labels:
+      - traefik.enable=false
+    depends_on: [mongo, redis]
+
+  bff-admin:
+    build: ./apps/bff-admin
+    environment:
+      - UPSTREAM_QUIZ=http://quiz-service:8000
+      - UPSTREAM_GAME=http://game-service:8000
+    labels:
+      - traefik.enable=true
+      - traefik.http.routers.bffadmin.rule=PathPrefix(`/admin`)
+      - traefik.http.routers.bffadmin.entrypoints=web,websecure,h3
+      - traefik.http.services.bffadmin.loadbalancer.server.port=8000
+    depends_on: [quiz-service, game-service]
+
+  bff-player:
+    build: ./apps/bff-player
+    environment:
+      - UPSTREAM_GAME=http://game-service:8000
+    labels:
+      - traefik.enable=true
+      - traefik.http.routers.bffplayer.rule=PathPrefix(`/player`)
+      - traefik.http.routers.bffplayer.entrypoints=web,websecure,h3
+      - traefik.http.services.bffplayer.loadbalancer.server.port=8000
+    depends_on: [game-service]
+
+  ws-gateway:
+    build: ./gateway/realtime
+    environment:
+      - REDIS_URL=${REDIS_URL:-redis://redis:6379/0}
+    labels:
+      - traefik.enable=true
+      - traefik.http.routers.wsgw.rule=PathPrefix(`/ws`)
+      - traefik.http.routers.wsgw.entrypoints=web,websecure,h3
+      - traefik.http.services.wsgw.loadbalancer.server.port=8000
+    depends_on: [redis]
+
+volumes:
+  mongo_data: {}
