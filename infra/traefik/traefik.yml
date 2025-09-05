@@ -4,7 +4,16 @@ log:
   level: INFO
 api:
   dashboard: true
+
 providers:
   file:
     directory: /etc/traefik/dynamic
     watch: true
+
+entryPoints:
+  web:
+    address: ":80"
+  websecure:
+    address: ":443"
+  h3:
+    address: ":443/udp"

@@ -13,6 +13,7 @@ services:
     volumes:
       - ./infra/traefik/traefik.yml:/etc/traefik/traefik.yml:ro
       - ./infra/traefik/dynamic:/etc/traefik/dynamic:ro
+      - /var/run/podman/podman.sock:/var/run/podman/podman.sock:ro
     depends_on:
       - bff-admin
       - bff-player
