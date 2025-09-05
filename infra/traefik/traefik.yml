@@ -1,3 +1,5 @@
+global:
+  sendAnonymousUsage: false
 log:
   level: INFO
 api:
@@ -6,4 +8,3 @@ providers:
   file:
     directory: /etc/traefik/dynamic
     watch: true
-certificatesResolvers: {}

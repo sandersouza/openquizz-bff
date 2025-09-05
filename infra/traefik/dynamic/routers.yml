@@ -2,5 +2,3 @@ http:
   middlewares:
     gzip:
       compress: {}
-  routers:
-  services: {}
