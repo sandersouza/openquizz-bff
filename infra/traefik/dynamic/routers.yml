@@ -2,3 +2,12 @@ http:
   middlewares:
     gzip:
       compress: {}
+
+  routers:
+    traefik-dashboard:
+      rule: PathPrefix(`/dashboard`) || PathPrefix(`/api`)
+      entryPoints:
+        - web
+      service: api@internal
+      middlewares:
+        - gzip
