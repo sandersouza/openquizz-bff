@@ -1,0 +1,142 @@
+{
+  "info": {
+    "name": "OpenQuiz BFF",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "variable": [
+    {"key": "quiz_service", "value": "http://localhost:8000"},
+    {"key": "bff_admin", "value": "http://localhost/admin"}
+  ],
+  "item": [
+    {
+      "name": "Quiz Service",
+      "item": [
+        {
+          "name": "Health",
+          "request": {
+            "method": "GET",
+            "url": "{{quiz_service}}/healthz"
+          }
+        },
+        {
+          "name": "Create Quiz",
+          "request": {
+            "method": "POST",
+            "header": [{"key": "Content-Type", "value": "application/json"}],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"title\": \"Sample\",\n  \"questions\": []\n}"
+            },
+            "url": "{{quiz_service}}/quizzes"
+          }
+        },
+        {
+          "name": "Get Quiz",
+          "request": {
+            "method": "GET",
+            "url": "{{quiz_service}}/quizzes/:quiz_id"
+          }
+        },
+        {
+          "name": "List Quizzes",
+          "request": {
+            "method": "GET",
+            "url": {
+              "raw": "{{quiz_service}}/quizzes?limit=10&offset=0",
+              "host": ["{{quiz_service}}"],
+              "path": ["quizzes"],
+              "query": [
+                {"key": "limit", "value": "10"},
+                {"key": "offset", "value": "0"}
+              ]
+            }
+          }
+        },
+        {
+          "name": "Update Quiz",
+          "request": {
+            "method": "PUT",
+            "header": [{"key": "Content-Type", "value": "application/json"}],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"title\": \"Updated\",\n  \"questions\": []\n}"
+            },
+            "url": "{{quiz_service}}/quizzes/:quiz_id"
+          }
+        },
+        {
+          "name": "Delete Quiz",
+          "request": {
+            "method": "DELETE",
+            "url": "{{quiz_service}}/quizzes/:quiz_id"
+          }
+        }
+      ]
+    },
+    {
+      "name": "BFF Admin",
+      "item": [
+        {
+          "name": "Health",
+          "request": {
+            "method": "GET",
+            "url": "{{bff_admin}}/healthz"
+          }
+        },
+        {
+          "name": "Create Quiz",
+          "request": {
+            "method": "POST",
+            "header": [{"key": "Content-Type", "value": "application/json"}],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"title\": \"Sample\",\n  \"questions\": []\n}"
+            },
+            "url": "{{bff_admin}}/quizzes"
+          }
+        },
+        {
+          "name": "Get Quiz",
+          "request": {
+            "method": "GET",
+            "url": "{{bff_admin}}/quizzes/:quiz_id"
+          }
+        },
+        {
+          "name": "List Quizzes",
+          "request": {
+            "method": "GET",
+            "url": {
+              "raw": "{{bff_admin}}/quizzes?limit=10&offset=0",
+              "host": ["{{bff_admin}}"],
+              "path": ["quizzes"],
+              "query": [
+                {"key": "limit", "value": "10"},
+                {"key": "offset", "value": "0"}
+              ]
+            }
+          }
+        },
+        {
+          "name": "Update Quiz",
+          "request": {
+            "method": "PUT",
+            "header": [{"key": "Content-Type", "value": "application/json"}],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"title\": \"Updated\",\n  \"questions\": []\n}"
+            },
+            "url": "{{bff_admin}}/quizzes/:quiz_id"
+          }
+        },
+        {
+          "name": "Delete Quiz",
+          "request": {
+            "method": "DELETE",
+            "url": "{{bff_admin}}/quizzes/:quiz_id"
+          }
+        }
+      ]
+    }
+  ]
+}
