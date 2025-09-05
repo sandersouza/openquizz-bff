@@ -5,6 +5,7 @@ import pytest_asyncio
 import httpx
 from mongomock_motor import AsyncMongoMockClient
 import importlib.util
+import importlib
 
 ROOT = pathlib.Path(__file__).resolve().parents[2]
 COMMON_PATH = ROOT / "packages" / "common_schemas"
@@ -19,6 +20,7 @@ from app import db as quiz_db  # type: ignore  # noqa: E402
 spec = importlib.util.spec_from_file_location("bff_main", BFF_PATH / "app" / "main.py")
 bff_main = importlib.util.module_from_spec(spec)
 spec.loader.exec_module(bff_main)
+quizzes_module = importlib.import_module(f"{bff_main.__name__}.routes.quizzes")
 
 
 @pytest_asyncio.fixture
@@ -33,8 +35,8 @@ async def client(monkeypatch):
             kwargs.setdefault("base_url", "http://quiz-service:8000")
             return super().__init__(*args, **kwargs)
 
-    monkeypatch.setattr(bff_main.httpx, "AsyncClient", PatchedAsyncClient)
-    monkeypatch.setattr(bff_main, "UPSTREAM_QUIZ", "http://quiz-service:8000")
+    monkeypatch.setattr(quizzes_module.httpx, "AsyncClient", PatchedAsyncClient)
+    monkeypatch.setattr(quizzes_module, "UPSTREAM_QUIZ", "http://quiz-service:8000")
 
     async with httpx.AsyncClient(app=bff_main.app, base_url="http://test") as client:
         yield client

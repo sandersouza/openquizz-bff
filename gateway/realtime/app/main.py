@@ -1,53 +1,25 @@
-import os
-import asyncio
-from typing import Dict, Set
-from fastapi import FastAPI, WebSocket, WebSocketDisconnect
-from redis.asyncio import Redis
+import importlib.util
+import sys
+from pathlib import Path
+from fastapi import FastAPI
 
-REDIS_URL = os.getenv("REDIS_URL", "redis://localhost:6379/0")
-ROOM_PREFIX = "room:"
+app = FastAPI(title="ws-gateway", docs_url="/docs", redoc_url="/redocs", openapi_url="/openapi.json")
 
-app = FastAPI(title="ws-gateway")
-redis = Redis.from_url(REDIS_URL, decode_responses=True)
 
-sub_tasks: Dict[str, asyncio.Task] = {}
-rooms: Dict[str, Set[WebSocket]] = {}
+def include_route_modules() -> None:
+    package_dir = Path(__file__).parent / "routes"
+    base_package = __package__ or __name__
+    for path in package_dir.glob("*.py"):
+        if path.name == "__init__.py":
+            continue
+        module_name = f"{base_package}.routes.{path.stem}"
+        spec = importlib.util.spec_from_file_location(module_name, path)
+        module = importlib.util.module_from_spec(spec)
+        sys.modules[module_name] = module
+        spec.loader.exec_module(module)
+        router = getattr(module, "router", None)
+        if router is not None:
+            app.include_router(router)
 
-async def ensure_room_subscription(session_id: str):
-    if session_id in sub_tasks:
-        return
-    async def reader():
-        pubsub = redis.pubsub()
-        channel = ROOM_PREFIX + session_id
-        await pubsub.subscribe(channel)
-        async for msg in pubsub.listen():
-            if msg.get("type") == "message":
-                payload = msg.get("data")
-                for ws in list(rooms.get(session_id, set())):
-                    try:
-                        await ws.send_text(payload)
-                    except Exception:
-                        try:
-                            await ws.close()
-                        except Exception:
-                            pass
-                        rooms[session_id].discard(ws)
-    sub_tasks[session_id] = asyncio.create_task(reader())
 
-@app.get("/healthz")
-async def health():
-    pong = await redis.ping()
-    return {"status": "ok", "redis": pong}
-
-@app.websocket("/ws/{session_id}")
-async def ws_session(websocket: WebSocket, session_id: str):
-    await websocket.accept()
-    rooms.setdefault(session_id, set()).add(websocket)
-    await ensure_room_subscription(session_id)
-    try:
-        while True:
-            await websocket.receive_text()
-    except WebSocketDisconnect:
-        pass
-    finally:
-        rooms.get(session_id, set()).discard(websocket)
+include_route_modules()

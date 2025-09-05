@@ -1,25 +1,25 @@
-import os
-import httpx
-from fastapi import FastAPI, HTTPException
-from common_schemas import JoinRequest
+import importlib.util
+import sys
+from pathlib import Path
+from fastapi import FastAPI
 
-UPSTREAM_GAME = os.getenv("UPSTREAM_GAME", "http://game-service:8000")
+app = FastAPI(title="bff-player", docs_url="/docs", redoc_url="/redocs", openapi_url="/openapi.json")
 
-app = FastAPI(title="bff-player")
 
-@app.get("/player/healthz")
-async def health():
-    return {"status": "ok"}
+def include_route_modules() -> None:
+    package_dir = Path(__file__).parent / "routes"
+    base_package = __package__ or __name__
+    for path in package_dir.glob("*.py"):
+        if path.name == "__init__.py":
+            continue
+        module_name = f"{base_package}.routes.{path.stem}"
+        spec = importlib.util.spec_from_file_location(module_name, path)
+        module = importlib.util.module_from_spec(spec)
+        sys.modules[module_name] = module
+        spec.loader.exec_module(module)
+        router = getattr(module, "router", None)
+        if router is not None:
+            app.include_router(router)
 
-@app.post("/player/join")
-async def join(req: JoinRequest):
-    # MVP: placeholder - valida upstream e retorna instruções
-    async with httpx.AsyncClient() as client:
-        r = await client.get(f"{UPSTREAM_GAME}/healthz")
-        if r.status_code != 200:
-            raise HTTPException(r.status_code, "upstream unavailable")
-    return {
-        "session_id_hint": "use o PIN recebido ao criar a sessão no admin",
-        "ws_url": "/ws/{session_id}",
-        "nickname": req.nickname,
-    }
+
+include_route_modules()
