@@ -1,18 +1,25 @@
 http:
   routers:
+    traefik-dashboard:
+      rule: PathPrefix(`/dashboard`) || PathPrefix(`/api`)
+      entryPoints:
+        - web
+      service: api@internal
+      middlewares:
+        - gzip
     bff-admin:
       rule: PathPrefix(`/admin`)
-      entryPoints: [web, websecure, h3]
+      entryPoints: [web, websecure]
       service: bff-admin
       middlewares: [gzip]
     bff-player:
       rule: PathPrefix(`/player`)
-      entryPoints: [web, websecure, h3]
+      entryPoints: [web, websecure]
       service: bff-player
       middlewares: [gzip]
     ws-gateway:
       rule: PathPrefix(`/ws`)
-      entryPoints: [web, websecure, h3]
+      entryPoints: [web, websecure]
       service: ws-gateway
       middlewares: [gzip]
   services:
@@ -31,12 +38,3 @@ http:
   middlewares:
     gzip:
       compress: {}
-
-  routers:
-    traefik-dashboard:
-      rule: PathPrefix(`/dashboard`) || PathPrefix(`/api`)
-      entryPoints:
-        - web
-      service: api@internal
-      middlewares:
-        - gzip

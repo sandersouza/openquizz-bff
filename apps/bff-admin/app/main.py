@@ -8,8 +8,7 @@ from fastapi import FastAPI
 UPSTREAM_QUIZ = os.getenv("UPSTREAM_QUIZ", "http://quiz-service:8000")
 UPSTREAM_GAME = os.getenv("UPSTREAM_GAME", "http://game-service:8000")
 
-app = FastAPI(title="bff-admin", docs_url="/docs", redoc_url="/redocs", openapi_url="/openapi.json")
-
+app = FastAPI(title="bff-admin", docs_url="/admin/docs", redoc_url="/admin/redocs", openapi_url="/admin/openapi.json")
 
 def include_route_modules() -> None:
     package_dir = Path(__file__).parent / "routes"
@@ -25,6 +24,5 @@ def include_route_modules() -> None:
         router = getattr(module, "router", None)
         if router is not None:
             app.include_router(router)
-
 
 include_route_modules()

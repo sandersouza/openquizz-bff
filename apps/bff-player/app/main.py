@@ -3,8 +3,7 @@ import sys
 from pathlib import Path
 from fastapi import FastAPI
 
-app = FastAPI(title="bff-player", docs_url="/docs", redoc_url="/redocs", openapi_url="/openapi.json")
-
+app = FastAPI(title="bff-player", docs_url="/player/docs", redoc_url="/player/redocs", openapi_url="/player/openapi.json")
 
 def include_route_modules() -> None:
     package_dir = Path(__file__).parent / "routes"
@@ -20,6 +19,5 @@ def include_route_modules() -> None:
         router = getattr(module, "router", None)
         if router is not None:
             app.include_router(router)
-
 
 include_route_modules()

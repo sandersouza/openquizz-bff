@@ -15,5 +15,3 @@ entryPoints:
     address: ":80"
   websecure:
     address: ":443"
-  h3:
-    address: ":443/udp"
