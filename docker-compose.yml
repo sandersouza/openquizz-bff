@@ -9,6 +9,8 @@ services:
     ports:
       - "80:80"
       - "443:443"
+      - "8082:8082"
+
     volumes:
       - ./infra/traefik/traefik.yml:/etc/traefik/traefik.yml:ro
       - ./infra/traefik/dynamic:/etc/traefik/dynamic:ro

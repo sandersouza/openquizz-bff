@@ -1,7 +1,9 @@
 global:
   sendAnonymousUsage: false
+
 log:
   level: INFO
+
 api:
   dashboard: true
 
@@ -15,3 +17,11 @@ entryPoints:
     address: ":80"
   websecure:
     address: ":443"
+  metrics:
+    address: ":8082"
+
+metrics:
+  prometheus:
+    entryPoint: metrics
+    addEntryPointsLabels: true
+    addServicesLabels: true
