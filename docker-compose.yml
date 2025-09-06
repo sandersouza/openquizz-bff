@@ -75,7 +75,6 @@ services:
     depends_on: [redis]
 
   admin-frontend:
-    profiles: ["frontends"]
     build: ./frontends/admin
     container_name: openquiz-admin
     depends_on: [bff-admin]
@@ -85,7 +84,6 @@ services:
       - NEXT_PUBLIC_WS_BASE=ws://localhost
 
   player-frontend:
-    profiles: ["frontends"]
     build: ./frontends/player
     container_name: openquiz-player
     depends_on: [bff-player]
