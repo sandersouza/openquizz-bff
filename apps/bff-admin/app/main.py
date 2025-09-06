@@ -4,11 +4,21 @@ import importlib.util
 import sys
 from pathlib import Path
 from fastapi import FastAPI
+from fastapi.middleware.cors import CORSMiddleware
 
 UPSTREAM_QUIZ = os.getenv("UPSTREAM_QUIZ", "http://quiz-service:8000")
 UPSTREAM_GAME = os.getenv("UPSTREAM_GAME", "http://game-service:8000")
+ALLOWED_ORIGINS = os.getenv("ALLOWED_ORIGINS", "http://admin.localhost").split(",")
 
 app = FastAPI(title="bff-admin", docs_url="/admin/docs", redoc_url="/admin/redocs", openapi_url="/admin/openapi.json")
+
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=ALLOWED_ORIGINS,
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
 
 def include_route_modules() -> None:
     package_dir = Path(__file__).parent / "routes"
