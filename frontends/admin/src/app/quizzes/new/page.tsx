@@ -33,7 +33,7 @@ const questionSchema = z
 
 const schema = z.object({
   title: z.string().min(1),
-  questions: z.array(questionSchema).min(2).max(20),
+  questions: z.array(questionSchema).min(1).max(20),
 });
 
 type QuizForm = z.infer<typeof schema>;
