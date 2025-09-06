@@ -26,9 +26,13 @@ export default function RootLayout({
     <html lang="pt" suppressHydrationWarning>
       <body className={`${geistSans.variable} ${geistMono.variable} antialiased`}>
         <Providers>
-          <div className="flex">
+          <div className="flex min-h-screen">
             <Sidebar />
-            <main className="flex-1">{children}</main>
+            <main className="flex-1 flex items-center justify-center p-4">
+              <div className="w-full max-w-[750px] min-w-[400px] rounded-lg border bg-background shadow-md p-6">
+                {children}
+              </div>
+            </main>
           </div>
         </Providers>
       </body>
