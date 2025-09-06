@@ -4,6 +4,7 @@ import { useTranslation } from "react-i18next";
 import { useRouter } from "next/navigation";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
+import { PlusIcon, MinusIcon } from "lucide-react";
 import {
   useForm,
   useFieldArray,
@@ -42,20 +43,10 @@ type QuestionFieldsProps = {
   control: Control<QuizForm>;
   register: UseFormRegister<QuizForm>;
   t: (key: string) => string;
-  questionsLength: number;
-  appendQuestion: () => void;
   removeQuestion: (index: number) => void;
 };
 
-function QuestionFields({
-  index,
-  control,
-  register,
-  t,
-  questionsLength,
-  appendQuestion,
-  removeQuestion,
-}: QuestionFieldsProps) {
+function QuestionFields({ index, control, register, t, removeQuestion }: QuestionFieldsProps) {
   const {
     fields: answers,
     append: appendAnswer,
@@ -66,50 +57,43 @@ function QuestionFields({
   });
 
   return (
-    <div className="space-y-2">
-      <div className="flex items-end gap-2">
-        <div className="flex-grow">
-          <label className="block mb-1">
-            {t("quiz.question")} #{index + 1}
-          </label>
-          <Input {...register(`questions.${index}.text` as const)} />
-        </div>
-        <div>
-          <label className="block mb-1">{t("quiz.time_limit")}</label>
+    <div className="space-y-4 rounded-lg border p-4">
+      <div className="flex items-start gap-2">
+        <Input
+          placeholder={t("quiz.question")}
+          className="flex-grow"
+          {...register(`questions.${index}.text` as const)}
+        />
+        <div className="flex items-center gap-2">
           <Input
             type="number"
             min={10}
             max={60}
+            className="w-20"
             {...register(`questions.${index}.time_limit_s` as const, {
               valueAsNumber: true,
             })}
-            className="w-24"
           />
+          <span className="text-sm text-muted-foreground">
+            {t("quiz.seconds")}
+          </span>
         </div>
-        {questionsLength < 20 && index === questionsLength - 1 && (
-          <Button type="button" variant="outline" onClick={appendQuestion}>
-            +
-          </Button>
-        )}
-        {questionsLength > 2 && (
-          <Button
-            type="button"
-            variant="outline"
-            onClick={() => removeQuestion(index)}
-          >
-            -
-          </Button>
-        )}
+        <Button
+          type="button"
+          variant="outline"
+          size="icon"
+          onClick={() => removeQuestion(index)}
+        >
+          <MinusIcon className="size-4" />
+        </Button>
       </div>
       <div className="space-y-2">
-        <label className="block mb-1">{t("quiz.answer")}</label>
         {answers.map((ansField, ansIndex) => (
           <div key={ansField.id} className="flex items-center gap-2">
             <Input
               className="flex-grow"
-              {...register(
-                `questions.${index}.options.${ansIndex}.text` as const
-              )}
+              placeholder={t("quiz.answer")}
+              {...register(`questions.${index}.options.${ansIndex}.text` as const)}
             />
             <input
               type="radio"
@@ -119,26 +103,30 @@ function QuestionFields({
               })}
               aria-label={t("quiz.correct")}
             />
-            {answers.length < 5 && ansIndex === answers.length - 1 && (
-              <Button
-                type="button"
-                variant="outline"
-                onClick={() => appendAnswer({ text: "" })}
-              >
-                +
-              </Button>
-            )}
-            {answers.length > 2 && (
-              <Button
-                type="button"
-                variant="outline"
-                onClick={() => removeAnswer(ansIndex)}
-              >
-                -
-              </Button>
-            )}
           </div>
         ))}
+        <div className="flex gap-2 pt-2">
+          {answers.length < 5 && (
+            <Button
+              type="button"
+              variant="outline"
+              size="icon"
+              onClick={() => appendAnswer({ text: "" })}
+            >
+              <PlusIcon className="size-4" />
+            </Button>
+          )}
+          {answers.length > 2 && (
+            <Button
+              type="button"
+              variant="outline"
+              size="icon"
+              onClick={() => removeAnswer(answers.length - 1)}
+            >
+              <MinusIcon className="size-4" />
+            </Button>
+          )}
+        </div>
       </div>
     </div>
   );
@@ -190,11 +178,8 @@ export default function NewQuizPage() {
 
   return (
     <form onSubmit={onSubmit} className="p-4 space-y-4">
-      <div>
-        <label className="block mb-1">{t("quiz.title")}</label>
-        <Input {...register("title")} />
-      </div>
-      <div className="space-y-6">
+      <Input placeholder={t("quiz.title")} {...register("title")} />
+      <div className="space-y-4">
         {fields.map((field, index) => (
           <QuestionFields
             key={field.id}
@@ -202,19 +187,26 @@ export default function NewQuizPage() {
             control={control}
             register={register}
             t={t}
-            questionsLength={fields.length}
-            appendQuestion={() =>
-              append({
-                text: "",
-                time_limit_s: 20,
-                options: [{ text: "" }, { text: "" }],
-                correct: 0,
-              })
-            }
             removeQuestion={remove}
           />
         ))}
       </div>
+      {fields.length < 20 && (
+        <Button
+          type="button"
+          variant="outline"
+          onClick={() =>
+            append({
+              text: "",
+              time_limit_s: 20,
+              options: [{ text: "" }, { text: "" }],
+              correct: 0,
+            })
+          }
+        >
+          {t("quiz.add_question")}
+        </Button>
+      )}
       <Button type="submit">{t("quiz.new")}</Button>
     </form>
   );

@@ -9,6 +9,7 @@
     "answer": "Answer",
     "add_question": "Add question",
     "time_limit": "Time (s)",
+    "seconds": "Seconds",
     "correct": "Correct"
   }
 }
