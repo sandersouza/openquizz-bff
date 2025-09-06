@@ -20,6 +20,22 @@ async def health():
 class SessionOut(SessionState):
     pin: str
 
+@app.get("/sessions/{session_id}", response_model=SessionOut)
+async def get_session(session_id: str):
+    try:
+        _id = ObjectId(session_id)
+    except Exception:
+        raise HTTPException(400, "invalid id")
+    s = await db.sessions.find_one({"_id": _id})
+    if not s:
+        raise HTTPException(404, "session not found")
+    return SessionOut(
+        session_id=session_id,
+        state=s.get("state", "lobby"),
+        current_q_idx=int(s.get("current_q_idx", 0)),
+        pin=s.get("pin", ""),
+    )
+
 @app.post("/sessions", response_model=SessionOut)
 async def create_session(payload: SessionCreate):
     pin = str(random.randint(100000, 999999))

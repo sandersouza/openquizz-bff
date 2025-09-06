@@ -24,3 +24,30 @@ async def start_session(session_id: str):
         if r.status_code != 200:
             raise HTTPException(r.status_code, r.text)
         return r.json()
+
+
+@router.post("/admin/sessions/{session_id}/next", summary="Next question")
+async def next_question(session_id: str):
+    async with httpx.AsyncClient() as client:
+        r = await client.post(f"{UPSTREAM_GAME}/sessions/{session_id}/next")
+        if r.status_code != 200:
+            raise HTTPException(r.status_code, r.text)
+        return r.json()
+
+
+@router.post("/admin/sessions/{session_id}/end", summary="End session")
+async def end_session(session_id: str):
+    async with httpx.AsyncClient() as client:
+        r = await client.post(f"{UPSTREAM_GAME}/sessions/{session_id}/end")
+        if r.status_code != 200:
+            raise HTTPException(r.status_code, r.text)
+        return r.json()
+
+
+@router.get("/admin/sessions/{session_id}", summary="Get session")
+async def get_session(session_id: str):
+    async with httpx.AsyncClient() as client:
+        r = await client.get(f"{UPSTREAM_GAME}/sessions/{session_id}")
+        if r.status_code != 200:
+            raise HTTPException(r.status_code, r.text)
+        return r.json()
