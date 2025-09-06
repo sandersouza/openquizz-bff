@@ -1,0 +1,5 @@
+{
+  "app": { "title": "OpenQUIZ Admin" },
+  "nav": { "quizzes": "Quizzes", "sessions": "Sessões", "analytics": "Analytics" },
+  "quiz": { "title": "Título", "questions": "Perguntas", "new": "Novo Quiz" }
+}
