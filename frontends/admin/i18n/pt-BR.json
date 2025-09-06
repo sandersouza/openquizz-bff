@@ -7,6 +7,8 @@
     "new": "Novo Quiz",
     "question": "Pergunta",
     "answer": "Resposta",
-    "add_question": "Adicionar pergunta"
+    "add_question": "Adicionar pergunta",
+    "time_limit": "Tempo (s)",
+    "correct": "Correta"
   }
 }
