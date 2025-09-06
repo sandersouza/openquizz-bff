@@ -21,26 +21,26 @@ export default function QuizzesPage() {
   }, []);
 
   return (
-    <div className="p-4">
-      <h1 className="text-xl mb-4">{t("nav.quizzes")}</h1>
-      <table className="w-full text-left">
+    <div className="page-container">
+      <h1 className="page-title">{t("nav.quizzes")}</h1>
+      <table className="table-base">
         <thead>
           <tr>
-            <th className="p-2">{t("quiz.title")}</th>
-            <th className="p-2">{t("quiz.questions")}</th>
+            <th className="table-th">{t("quiz.title")}</th>
+            <th className="table-th">{t("quiz.questions")}</th>
           </tr>
         </thead>
         <tbody>
           {quizzes.map((q) => (
-            <tr key={q.id} className="border-t">
-              <td className="p-2">{q.title}</td>
-              <td className="p-2">{q.questions_count}</td>
+            <tr key={q.id} className="table-row">
+              <td className="table-td">{q.title}</td>
+              <td className="table-td">{q.questions_count}</td>
             </tr>
           ))}
         </tbody>
       </table>
       <Link href="/quizzes/new">
-        <Button className="mt-4">{t("quiz.new")}</Button>
+        <Button className="btn-top-gap">{t("quiz.new")}</Button>
       </Link>
     </div>
   );

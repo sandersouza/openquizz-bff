@@ -57,24 +57,24 @@ function QuestionFields({ index, control, register, t, removeQuestion }: Questio
   });
 
   return (
-    <div className="space-y-4 rounded-lg border p-4">
-      <div className="flex items-start gap-2">
+    <div className="card">
+      <div className="row">
         <Input
           placeholder={t("quiz.question")}
-          className="flex-grow"
+          className="grow"
           {...register(`questions.${index}.text` as const)}
         />
-        <div className="flex items-center gap-2">
+        <div className="inline-row">
           <Input
             type="number"
             min={10}
             max={60}
-            className="w-20"
+            className="w-20p"
             {...register(`questions.${index}.time_limit_s` as const, {
               valueAsNumber: true,
             })}
           />
-          <span className="text-sm text-muted-foreground">
+          <span className="muted-note">
             {t("quiz.seconds")}
           </span>
         </div>
@@ -84,14 +84,14 @@ function QuestionFields({ index, control, register, t, removeQuestion }: Questio
           size="icon"
           onClick={() => removeQuestion(index)}
         >
-          <MinusIcon className="size-4" />
+          <MinusIcon className="icon-sm" />
         </Button>
       </div>
-      <div className="space-y-2">
+      <div className="row-gap">
         {answers.map((ansField, ansIndex) => (
-          <div key={ansField.id} className="flex items-center gap-2">
+          <div key={ansField.id} className="inline-row">
             <Input
-              className="flex-grow"
+              className="grow"
               placeholder={t("quiz.answer")}
               {...register(`questions.${index}.options.${ansIndex}.text` as const)}
             />
@@ -105,7 +105,7 @@ function QuestionFields({ index, control, register, t, removeQuestion }: Questio
             />
           </div>
         ))}
-        <div className="flex gap-2 pt-2">
+        <div className="row-actions">
           {answers.length < 5 && (
             <Button
               type="button"
@@ -113,7 +113,7 @@ function QuestionFields({ index, control, register, t, removeQuestion }: Questio
               size="icon"
               onClick={() => appendAnswer({ text: "" })}
             >
-              <PlusIcon className="size-4" />
+              <PlusIcon className="icon-sm" />
             </Button>
           )}
           {answers.length > 2 && (
@@ -123,7 +123,7 @@ function QuestionFields({ index, control, register, t, removeQuestion }: Questio
               size="icon"
               onClick={() => removeAnswer(answers.length - 1)}
             >
-              <MinusIcon className="size-4" />
+              <MinusIcon className="icon-sm" />
             </Button>
           )}
         </div>
@@ -177,9 +177,9 @@ export default function NewQuizPage() {
   });
 
   return (
-    <form onSubmit={onSubmit} className="p-4 space-y-4">
+    <form onSubmit={onSubmit} className="form-root">
       <Input placeholder={t("quiz.title")} {...register("title")} />
-      <div className="space-y-4">
+      <div className="stack">
         {fields.map((field, index) => (
           <QuestionFields
             key={field.id}

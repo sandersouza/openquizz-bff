@@ -7,7 +7,7 @@ import { useTranslation } from "react-i18next";
 
 import { cn } from "@/lib/utils";
 import { Button } from "../ui/button";
-import { DarkModeToggle } from "../dark-mode-toggle";
+import { BookOpen, PlayCircle, BarChart3 } from "lucide-react";
 
 export function Sidebar() {
   const { t } = useTranslation();
@@ -15,48 +15,57 @@ export function Sidebar() {
   const [collapsed, setCollapsed] = useState(false);
 
   const links = [
-    { href: "/quizzes", label: t("nav.quizzes") },
-    { href: "/sessions", label: t("nav.sessions") },
-    { href: "/analytics", label: t("nav.analytics") },
+    { href: "/quizzes", label: t("nav.quizzes"), icon: BookOpen },
+    { href: "/sessions", label: t("nav.sessions"), icon: PlayCircle },
+    { href: "/analytics", label: t("nav.analytics"), icon: BarChart3 },
   ];
 
   return (
     <div
       className={cn(
-        "relative transition-all duration-300",
-        collapsed ? "w-4" : "w-48"
+        "sidebar-wrapper",
+        collapsed ? "sidebar-wrapper-collapsed" : "sidebar-wrapper-expanded"
       )}
     >
       <aside
         className={cn(
-          "h-screen border-r p-4 flex flex-col gap-4 bg-background rounded-r-md transition-transform duration-300",
-          collapsed ? "-translate-x-full" : "translate-x-0"
+          "sidebar",
+          collapsed ? "sidebar-collapsed" : "sidebar-expanded"
         )}
       >
-        <nav className="flex flex-col gap-2">
-          {links.map((link) => (
-            <Link key={link.href} href={link.href}>
-              <Button
-                variant={
-                  pathname.startsWith(link.href) ? "secondary" : "ghost"
-                }
-                className="w-full justify-start"
-              >
-                {link.label}
-              </Button>
-            </Link>
-          ))}
+        <nav className="nav-list">
+          {links.map((link) => {
+            const Icon = link.icon;
+            const active = pathname.startsWith(link.href);
+            return (
+              <Link key={link.href} href={link.href}>
+                <Button
+                  variant={active ? "secondary" : "ghost"}
+                  className={cn("menu-button", collapsed && "menu-button-collapsed")}
+                  aria-label={collapsed ? link.label : undefined}
+                  title={collapsed ? link.label : undefined}
+                >
+                  <Icon className="menu-icon" />
+                  <span className={cn("menu-label", collapsed && "menu-label-hidden")}>{link.label}</span>
+                  <span className={cn(!collapsed ? undefined : "menu-spacer-hidden")} aria-hidden="true" />
+                </Button>
+              </Link>
+            );
+          })}
         </nav>
-        <div className="mt-auto">
-          <DarkModeToggle />
-        </div>
+        {/* Theme toggle moved to global top-right in layout */}
       </aside>
       <button
         type="button"
         onClick={() => setCollapsed((c) => !c)}
-        className="absolute top-2 -right-3 w-6 h-6 flex items-center justify-center rounded-r-md border bg-background shadow" 
+        className="toggle-tab"
+        aria-label={collapsed ? "Exibir menu" : "Ocultar menu"}
       >
-        {collapsed ? ">" : "<"}
+        <span className="hamburger" aria-hidden="true">
+          <span className="hamburger-line" />
+          <span className="hamburger-line" />
+          <span className="hamburger-line" />
+        </span>
       </button>
     </div>
   );

@@ -120,3 +120,149 @@
     @apply bg-background text-foreground;
   }
 }
+
+@layer components {
+  /* Layout containers */
+  .layout-root {
+    @apply flex min-h-screen;
+  }
+  .layout-main {
+    @apply flex-1 flex items-center justify-center p-4;
+  }
+  .floating-frame {
+    @apply w-full max-w-[750px] min-w-[400px] rounded-lg border bg-background shadow-md p-6;
+  }
+
+  /* Sidebar */
+  .sidebar-wrapper {
+    @apply relative transition-all duration-300;
+  }
+  .sidebar-wrapper-expanded {
+    @apply w-48;
+  }
+  .sidebar-wrapper-collapsed {
+    /* Collapsed width wide enough to show icons */
+    @apply w-14;
+  }
+  .sidebar {
+    @apply h-screen border-r p-4 flex flex-col gap-4 bg-background rounded-r-md transition-transform duration-300;
+  }
+  .sidebar-expanded {
+    @apply translate-x-0;
+  }
+  .sidebar-collapsed {
+    /* Keep sidebar in place when collapsed to preserve divider visibility */
+    @apply translate-x-0;
+  }
+  .nav-list {
+    @apply flex flex-col gap-2;
+  }
+  .menu-button {
+    width: 100%;
+    display: grid;
+    grid-template-columns: 1.5rem 1fr 1.5rem; /* icon | centered label | spacer */
+    align-items: center;
+    gap: 0.5rem; /* ~ gap-2 */
+    padding-left: 0.5rem; /* px-2 */
+    padding-right: 0.5rem;
+  }
+  .menu-button-collapsed {
+    grid-template-columns: 1.5rem; /* only icon column */
+    padding-right: 0; /* keep icon aligned left */
+  }
+  .menu-icon {
+    height: 1.25rem; /* h-5 */
+    width: 1.25rem;  /* w-5 */
+    justify-self: start; /* left aligned */
+  }
+  .menu-label {
+    @apply text-sm text-center;
+  }
+  .menu-label-hidden {
+    @apply hidden;
+  }
+  .menu-spacer-hidden {
+    @apply hidden;
+  }
+  .toggle-tab {
+    /* Integrated with the divider line as a single piece */
+    @apply absolute top-2 -right-[23px] w-6 h-12 flex items-center justify-center rounded-r-md rounded-l-none border bg-background shadow z-20;
+    @apply border-l-0; /* seamless with sidebar right border */
+  }
+  .hamburger {
+    @apply flex flex-col items-center justify-center gap-0.5;
+  }
+  .hamburger-line {
+    @apply w-3 h-0.5 bg-foreground rounded;
+  }
+
+  /* Sonner toaster variables (extracted from inline style) */
+  .toaster {
+    --normal-bg: var(--popover);
+    --normal-text: var(--popover-foreground);
+    --normal-border: var(--border);
+  }
+
+  /* Global theme toggle position */
+  .theme-toggle-fixed {
+    @apply fixed top-4 right-4 z-50;
+  }
+
+  /* Page-level helpers to avoid inline utility classes */
+  .page-container {
+    @apply p-4;
+  }
+  .page-title {
+    @apply text-xl mb-4;
+  }
+  .table-base {
+    @apply w-full text-left;
+  }
+  .table-th {
+    @apply p-2;
+  }
+  .table-row {
+    @apply border-t;
+  }
+  .table-td {
+    @apply p-2;
+  }
+  .btn-top-gap {
+    @apply mt-4;
+  }
+
+  /* Form + card helpers (New Quiz) */
+  .form-root {
+    @apply p-4 space-y-4;
+  }
+  .stack {
+    @apply space-y-4;
+  }
+  .card {
+    @apply space-y-4 rounded-lg border p-4;
+  }
+  .row {
+    @apply flex items-start gap-2;
+  }
+  .inline-row {
+    @apply flex items-center gap-2;
+  }
+  .row-gap {
+    @apply space-y-2;
+  }
+  .row-actions {
+    @apply flex gap-2 pt-2;
+  }
+  .grow {
+    @apply flex-grow;
+  }
+  .w-20p {
+    @apply w-20;
+  }
+  .muted-note {
+    @apply text-sm text-muted-foreground;
+  }
+  .icon-sm {
+    @apply size-4;
+  }
+}
