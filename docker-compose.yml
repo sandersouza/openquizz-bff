@@ -75,22 +75,25 @@ services:
     depends_on: [redis]
 
   admin-frontend:
-    build: ./frontends/admin
+    build:
+      context: ./frontends/admin
+      args:
+        NEXT_PUBLIC_API_BASE: http://localhost/admin
+        NEXT_PUBLIC_WS_BASE: ws://localhost
     container_name: openquiz-admin
     depends_on: [bff-admin]
     environment:
       - NODE_ENV=production
-      - NEXT_PUBLIC_API_BASE=/admin
-      - NEXT_PUBLIC_WS_BASE=ws://localhost
-
   player-frontend:
-    build: ./frontends/player
+    build:
+      context: ./frontends/player
+      args:
+        NEXT_PUBLIC_API_BASE: http://localhost/player
+        NEXT_PUBLIC_WS_BASE: ws://localhost
     container_name: openquiz-player
     depends_on: [bff-player]
     environment:
       - NODE_ENV=production
-      - NEXT_PUBLIC_API_BASE=/player
-      - NEXT_PUBLIC_WS_BASE=ws://localhost
 
 volumes:
   mongo_data: {}
