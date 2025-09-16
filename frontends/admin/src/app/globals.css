@@ -142,7 +142,7 @@
   }
   .sidebar-wrapper-collapsed {
     /* Collapsed width wide enough to show icons */
-    @apply w-14;
+    @apply w-16; /* collapse less for better hit area */
   }
   .sidebar {
     @apply h-screen border-r p-4 flex flex-col gap-4 bg-background rounded-r-md transition-transform duration-300;
@@ -160,19 +160,19 @@
   .menu-button {
     width: 100%;
     display: grid;
-    grid-template-columns: 1.5rem 1fr 1.5rem; /* icon | centered label | spacer */
+    grid-template-columns: 1.25rem 1fr 1.25rem; /* icon | centered label | spacer */
     align-items: center;
     gap: 0.5rem; /* ~ gap-2 */
     padding-left: 0.5rem; /* px-2 */
     padding-right: 0.5rem;
   }
   .menu-button-collapsed {
-    grid-template-columns: 1.5rem; /* only icon column */
+    grid-template-columns: 1.25rem; /* only icon column */
     padding-right: 0; /* keep icon aligned left */
   }
   .menu-icon {
-    height: 1.25rem; /* h-5 */
-    width: 1.25rem;  /* w-5 */
+    height: 1rem; /* h-4 */
+    width: 1rem;  /* w-4 */
     justify-self: start; /* left aligned */
   }
   .menu-label {
@@ -210,7 +210,7 @@
 
   /* Base UI components */
   .button {
-    @apply inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-md text-sm font-medium transition-all disabled:pointer-events-none disabled:opacity-50 outline-none focus-visible:border-ring focus-visible:ring-ring/50 focus-visible:ring-[3px] aria-invalid:ring-destructive/20 dark:aria-invalid:ring-destructive/40 aria-invalid:border-destructive;
+    @apply inline-flex items-center justify-left gap-2 whitespace-nowrap rounded-md text-sm font-medium transition-all disabled:pointer-events-none disabled:opacity-50 outline-none focus-visible:border-ring focus-visible:ring-ring/50 focus-visible:ring-[3px] aria-invalid:ring-destructive/20 dark:aria-invalid:ring-destructive/40 aria-invalid:border-destructive;
   }
   .button > svg {
     @apply pointer-events-none shrink-0;
