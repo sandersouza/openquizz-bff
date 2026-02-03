@@ -23,20 +23,32 @@ async def ensure_room_subscription(session_id: str):
         pubsub = redis.pubsub()
         channel = ROOM_PREFIX + session_id
         await pubsub.subscribe(channel)
-        async for msg in pubsub.listen():
-            if msg.get("type") == "message":
-                payload = msg.get("data")
-                for ws in list(rooms.get(session_id, set())):
-                    try:
-                        await ws.send_text(payload)
-                    except Exception:
+        try:
+            async for msg in pubsub.listen():
+                if msg.get("type") == "message":
+                    payload = msg.get("data")
+                    for ws in list(rooms.get(session_id, set())):
                         try:
-                            await ws.close()
+                            await ws.send_text(payload)
                         except Exception:
-                            pass
-                        rooms[session_id].discard(ws)
+                            try:
+                                await ws.close()
+                            except Exception:
+                                pass
+                            rooms[session_id].discard(ws)
+        except asyncio.CancelledError:
+            raise
+        finally:
+            await pubsub.unsubscribe(channel)
+            await pubsub.close()
+            sub_tasks.pop(session_id, None)
 
     sub_tasks[session_id] = asyncio.create_task(reader())
+
+def cleanup_room_subscription(session_id: str):
+    task = sub_tasks.get(session_id)
+    if task is not None:
+        task.cancel()
 
 
 @router.websocket("/ws/{session_id}")
@@ -50,4 +62,8 @@ async def ws_session(websocket: WebSocket, session_id: str):
     except WebSocketDisconnect:
         pass
     finally:
-        rooms.get(session_id, set()).discard(websocket)
+        room = rooms.get(session_id, set())
+        room.discard(websocket)
+        if not room:
+            rooms.pop(session_id, None)
+            cleanup_room_subscription(session_id)

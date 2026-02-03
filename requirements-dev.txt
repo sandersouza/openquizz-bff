@@ -1,0 +1,8 @@
+-r apps/bff-admin/requirements.txt
+-r apps/bff-player/requirements.txt
+-r services/quiz-service/requirements.txt
+-r services/game-service/requirements.txt
+-r gateway/realtime/requirements.txt
+pytest==8.3.3
+pytest-asyncio==0.24.0
+mongomock-motor==0.0.35

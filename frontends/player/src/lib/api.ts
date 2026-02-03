@@ -2,7 +2,7 @@ export async function joinGame(name: string, code: string) {
   const res = await fetch(`${process.env.NEXT_PUBLIC_API_BASE}/join`, {
     method: "POST",
     headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({ name, code }),
+    body: JSON.stringify({ nickname: name, pin: code }),
   });
 
   if (!res.ok) {

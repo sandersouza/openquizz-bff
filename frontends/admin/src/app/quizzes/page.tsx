@@ -9,7 +9,8 @@ import { Button } from "@/components/ui/button";
 type Quiz = {
   id: string;
   title: string;
-  questions_count: number;
+  questions?: Array<unknown>;
+  questions_count?: number;
 };
 
 export default function QuizzesPage() {
@@ -34,7 +35,7 @@ export default function QuizzesPage() {
           {quizzes.map((q) => (
             <tr key={q.id} className="table-row">
               <td className="table-td">{q.title}</td>
-              <td className="table-td">{q.questions_count}</td>
+              <td className="table-td">{q.questions_count ?? q.questions?.length ?? 0}</td>
             </tr>
           ))}
         </tbody>

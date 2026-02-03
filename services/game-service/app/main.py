@@ -1,9 +1,8 @@
 from fastapi import FastAPI, HTTPException
-from pydantic import BaseModel
 from motor.motor_asyncio import AsyncIOMotorClient
 from bson import ObjectId
 import os, random
-from common_schemas import SessionCreate, SessionState
+from common_schemas import JoinRequest, SessionCreate, SessionState
 from .broker import publish, redis, PIN_PREFIX
 
 MONGO_URI = os.getenv("MONGO_URI", "mongodb://localhost:27017/openquiz")
@@ -19,6 +18,10 @@ async def health():
 
 class SessionOut(SessionState):
     pin: str
+
+class JoinOut(SessionState):
+    nickname: str
+    ws_url: str
 
 @app.get("/sessions/{session_id}", response_model=SessionOut)
 async def get_session(session_id: str):
@@ -51,6 +54,26 @@ async def create_session(payload: SessionCreate):
     await publish(session_id, {"type": "lobby", "session_id": session_id})
     return SessionOut(session_id=session_id, state="lobby", current_q_idx=0, pin=pin)
 
+@app.post("/join", response_model=JoinOut)
+async def join_session(payload: JoinRequest):
+    session_id = await redis.get(PIN_PREFIX + payload.pin)
+    if not session_id:
+        raise HTTPException(404, "invalid pin")
+    try:
+        _id = ObjectId(session_id)
+    except Exception:
+        raise HTTPException(404, "session not found")
+    s = await db.sessions.find_one({"_id": _id})
+    if not s:
+        raise HTTPException(404, "session not found")
+    return JoinOut(
+        session_id=session_id,
+        state=s.get("state", "lobby"),
+        current_q_idx=int(s.get("current_q_idx", 0)),
+        nickname=payload.nickname,
+        ws_url=f"/ws/{session_id}",
+    )
+
 @app.post("/sessions/{session_id}/start", response_model=SessionState)
 async def start_session(session_id: str):
     try:
@@ -58,9 +81,10 @@ async def start_session(session_id: str):
     except Exception:
         raise HTTPException(400, "invalid id")
     updated = await db.sessions.update_one({"_id": _id}, {"$set": {"state": "question", "current_q_idx": 0}})
-    if not updated.modified_count:
+    if not updated.matched_count:
         raise HTTPException(404, "session not found")
-    await publish(session_id, {"type": "question", "idx": 0})
+    if updated.modified_count:
+        await publish(session_id, {"type": "question", "idx": 0})
     return SessionState(session_id=session_id, state="question", current_q_idx=0)
 
 @app.post("/sessions/{session_id}/next", response_model=SessionState)
@@ -84,7 +108,8 @@ async def end_session(session_id: str):
     except Exception:
         raise HTTPException(400, "invalid id")
     updated = await db.sessions.update_one({"_id": _id}, {"$set": {"state": "ended"}})
-    if not updated.modified_count:
+    if not updated.matched_count:
         raise HTTPException(404, "session not found")
-    await publish(session_id, {"type": "ended"})
+    if updated.modified_count:
+        await publish(session_id, {"type": "ended"})
     return SessionState(session_id=session_id, state="ended", current_q_idx=-1)
